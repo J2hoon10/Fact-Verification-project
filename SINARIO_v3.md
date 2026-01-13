@@ -134,8 +134,40 @@ $$E_{final} = E_1 \cup E_2$$
 
 ---
 
+## 🔁 6. Feedback & Backtracking Logic (피드백 및 역추적 요약)
+
+시스템이 멈추지 않고 정답을 찾을 때까지 순환하는 **3가지 핵심 피드백 루프**를 시각화한다.
+
+### 6.1 Logic Flowchart (Mermaid)
+```mermaid
+graph TD
+    Start([Start]) --> A[Phase 1: Priority Queue 생성]
+    A --> B{Queue가 비었는가?}
+    B -- Yes --> Fail([검증 실패 / NEI])
+    B -- No --> C[Phase 2: 키워드 추출 & 1차 검색]
+    
+    C --> D{Phase 2: 문서 신뢰도 > Threshold?}
+    D -- No (문서 못 찾음) --> E[Backtrack: 다음 키워드 선정]
+    E --> B
+    
+    D -- Yes (문서 찾음) --> F[Phase 3: Gatekeeper NLI 검증]
+    
+    F --> G{NLI Entailment Score?}
+    
+    G -- "High (> 0.9)" --> H([Phase 5: 최종 판결 (Stop)])
+    
+    G -- "Mid (0.3 ~ 0.9)" --> I[Phase 4: 문맥 확장 (Bridge 발견)]
+    I --> J[이전 문서 요약 + 미해결 키워드로 2차 검색]
+    J --> F
+    
+    G -- "Low (< 0.3)" --> K[Reject: 문서 폐기]
+    K --> E
+```
+---
+
 ## 📝 Summary of Key Formulas (핵심 수식 요약)
 
 1.  **우선순위 점수:** $\text{Score} = \text{IDF} \times (1 + \text{Attention})$
 2.  **검색 유사도:** $Sim = E_Q(Q) \cdot E_D(D)$
+
 3.  **게이트키퍼 분기:** Entailment 확률 $0.3 \sim 0.9$ 구간에서 **Bridge(연결)** 판정.
