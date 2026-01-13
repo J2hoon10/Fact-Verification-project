@@ -144,20 +144,20 @@ $$E_{final} = E_1 \cup E_2$$
 graph TD
     Start([Start]) --> A[Phase 1: Priority Queue 생성]
     A --> B{Queue가 비었는가?}
-    B -- Yes --> Fail([검증 실패 / NEI])
+    B -- Yes --> Fail(["검증 실패 / NEI"])
     B -- No --> C[Phase 2: 키워드 추출 & 1차 검색]
     
     C --> D{문서 신뢰도 > Threshold?}
-    D -- No (문서 못 찾음) --> E[Backtrack: 다음 키워드 선정]
+    D -- No --> E[Backtrack: 다음 키워드 선정]
     E --> B
     
-    D -- Yes (문서 찾음) --> F[Phase 3: Gatekeeper NLI 검증]
+    D -- Yes --> F[Phase 3: Gatekeeper NLI 검증]
     
     F --> G{NLI Entailment Score?}
     
-    G -- "High (> 0.9)" --> H([Phase 5: 최종 판결 (Stop)])
+    G -- "High (> 0.9)" --> H(["Phase 5: 최종 판결 (Stop)"])
     
-    G -- "Mid (0.3 ~ 0.9)" --> I[Phase 4: 문맥 확장 (Bridge 발견)]
+    G -- "Mid (0.3 ~ 0.9)" --> I["Phase 4: 문맥 확장 (Bridge 발견)"]
     I --> J[이전 문서 요약 + 미해결 키워드로 2차 검색]
     J --> F
     
