@@ -140,18 +140,24 @@ $$E_{final} = \text{join}(E_1, E_2)$$
 ### 6.1 Logic Flowchart
 ```mermaid
 graph TD
-    Start([Start]) --> A[Phase 1: Spacy 분석 & Stack 생성]
-    A --> B{Stack Empty OR Attempts >= 3?}
-    B -- Yes --> Finish(["최종 판결 (Final Output)"])
-    B -- No --> C[Pop Target Keyword]
+    Start([Start]) --> A[Phase 1: Priority Queue 생성]
+    A --> B{Queue가 비었는가?}
+    B -- Yes --> Fail(["검증 실패 / NEI"])
+    B -- No --> C[Phase 2: 키워드 추출 & 1차 검색]
     
-    C --> D[Phase 2: Query(Keyword + SEP + Context) 생성]
-    D --> E[DPR 검색 & Evidence Selection]
+    C --> D{문서 신뢰도 > Threshold?}
+    D -- No --> E[Backtrack: 다음 키워드 선정]
+    E --> B
     
-    E --> F[Evidence Pool 업데이트 (E_total)]
-    F --> G[Phase 3: Verifier (NLI) 수행]
+    D -- Yes --> F[Phase 3: Gatekeeper NLI 검증]
     
-    G --> H{Is Clear Decision?}
-    H -- "Yes (High Confidence)" --> Stop(["Stop & Return Label"])
-    H -- "No (Ambiguous / NEI)" --> I[Log Status & Continue]
-    I --> B
+    F --> G{NLI Entailment Score?}
+    
+    G -- "High (> 0.9)" --> H(["Phase 5: 최종 판결 (Stop)"])
+    
+    G -- "Mid (0.3 ~ 0.9)" --> I["Phase 4: 문맥 확장 (Bridge 발견)"]
+    I --> J[이전 문서 요약 + 미해결 키워드로 2차 검색]
+    J --> F
+    
+    G -- "Low (< 0.3)" --> K[Reject: 문서 폐기]
+    K --> E
